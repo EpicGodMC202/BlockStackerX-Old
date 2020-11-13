@@ -11,6 +11,9 @@
 out/
 target/
 lib/
+/com/
+/me/
+/world/
 
 # Compiled class file
 *.class
