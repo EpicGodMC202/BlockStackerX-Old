@@ -1,0 +1,47 @@
+langFile: "English.yml"
+
+storage:
+  #AutoSave options
+  autosave:
+    #Wether autosave is enabled, if disabled you risk losing data if your server crashes
+    enabled: true
+    #How often autosave occurs in minutes
+    interval: 1
+  #Supported methods are: sqlite,
+  method: "sqlite"
+
+
+AutoSave: true
+AutoSaveInterval: 15
+global:
+  addAction: "RIGHT_CLICK_BLOCK"
+  subtractAction: "LEFT_CLICK_BLOCK"
+
+stackers:
+  example:
+    gui: "example"
+    displayOffset: "0.5,1.7,0.5"
+    blockType: "IRON_BLOCK"
+    displayName: "&d&lExample Stacker"
+    glow: true
+    lore:
+      - '&1line1'
+      - '&2line2'
+      - '&3line3'
+    valueFormat: "&d&l%value%"
+    maxStorage: 1000
+    teamStacking: false
+    availableBlocks:
+      - 'DIAMOND_BLOCK'
+      - 'EMERALD_BLOCK'
+      - 'IRON_BLOCK'
+    stackerItem:
+      displayName: "&d&lExample Stacker"
+      glow: false
+      lore:
+        - '&e&l========================='
+        - ''
+        - '&e&lContains&f&l %1 &e&lblocks'
+        - '&e&lOwned by &f&l%2'
+        - ''
+        - '&e&l========================='
