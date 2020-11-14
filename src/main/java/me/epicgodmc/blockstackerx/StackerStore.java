@@ -97,7 +97,7 @@ public class StackerStore
     {
         long delay = (plugin.getConfig().getLong("storage.autosave.interval") * 20) * 60;
         Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, task -> {
-            getStackerStorage().saveStackers(this.stackers);
+            getStackerStorage().saveStackers(this.stackers, false);
             BlockStackerX.logger.info("Saved stackers!");
         }, delay, delay);
     }

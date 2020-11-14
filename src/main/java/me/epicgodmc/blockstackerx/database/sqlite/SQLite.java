@@ -10,14 +10,13 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.logging.Level;
 
-public class SQLite extends SqLiteDatabase
+public class SQLite extends SQLiteDatabase
 {
 
     private final String dbName = "database";
 
     public SQLite(BlockStackerX plugin) {
         super(plugin);
-
     }
     public String SQLiteCreateDataTable = "CREATE TABLE IF NOT EXISTS bsx_stackers (" +
             "`owner` varchar(36) NOT NULL," +
@@ -42,13 +41,13 @@ public class SQLite extends SqLiteDatabase
             }
         }
         try{
-            if (connection!=null&&!connection.isClosed())
+            if (conn!=null&&!conn.isClosed())
             {
-                return connection;
+                return conn;
             }
             Class.forName("org.sqlite.JDBC");
-            connection = DriverManager.getConnection("jdbc:sqlite:" + dataFolder);
-            return connection;
+            conn = DriverManager.getConnection("jdbc:sqlite:" + dataFolder);
+            return conn;
         }catch (SQLException ex)
         {
             plugin.getLogger().log(Level.SEVERE,"SQLite exception on initialize", ex);
@@ -61,9 +60,9 @@ public class SQLite extends SqLiteDatabase
 
     @Override
     public boolean load() {
-        connection = getSQLConnection();
+        conn = getSQLConnection();
         try{
-            Statement s = connection.createStatement();
+            Statement s = conn.createStatement();
             s.executeUpdate(SQLiteCreateDataTable);
             s.close();
         }catch (SQLException e)

@@ -19,7 +19,7 @@ public interface StackerStorage
 
     void loadStackers();
 
-    void saveStackers(Map<Location, StackerBlock> stackers);
+    void saveStackers(Map<Location, StackerBlock> stackers, boolean onDisable);
 
 
 }

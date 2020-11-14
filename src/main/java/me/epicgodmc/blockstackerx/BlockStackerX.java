@@ -69,7 +69,7 @@ public final class BlockStackerX extends JavaPlugin {
         }
         logger.info("==================================================================");
         logger.info("Saving data");
-        getStackerStore().getStackerStorage().saveStackers(getStackerStore().getStackers());
+        getStackerStore().getStackerStorage().saveStackers(getStackerStore().getStackers(), true);
         logger.info("Finalizing");
         GuiPage.onDisable();
         instance = null;
