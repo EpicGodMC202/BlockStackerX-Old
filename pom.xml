@@ -42,7 +42,7 @@
 
         <repository>
             <id>lib</id>
-            <url>file://${project.basedir}/lib</url>
+            <url>file://D:/APIS/maven</url>
         </repository>
 
     </repositories>
