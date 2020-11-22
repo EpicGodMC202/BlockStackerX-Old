@@ -49,11 +49,6 @@ public abstract class SQLiteDatabase implements StackerStorage {
     }
 
     @Override
-    public StackerBlock getStacker(UUID owner) {
-        return null;
-    }
-
-    @Override
     public void setStacker(StackerBlock stacker) {
         PreparedStatement ps = null;
         establishConnection();

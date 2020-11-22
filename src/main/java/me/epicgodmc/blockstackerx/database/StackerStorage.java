@@ -4,12 +4,10 @@ import me.epicgodmc.blockstackerx.StackerBlock;
 import org.bukkit.Location;
 
 import java.util.Map;
-import java.util.UUID;
+
 
 public interface StackerStorage
 {
-
-    StackerBlock getStacker(UUID owner);
 
     void setStacker(StackerBlock stacker);
 

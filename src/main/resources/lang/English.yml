@@ -1,5 +1,8 @@
 prefix: "&d&lBlockStackerX &7"
 messages:
+  stackerTopHeader: "&d&l=============================="
+  stackerTopFooter: "&d&l=============================="
+  stackerTopFormat: "&f&l%1. &d%2 &7- &d%3"
   noStackTypeSelected: "Your stacker needs a block selected in order to do this action"
   usePickaxe: "Please use a pickaxe to break stackers"
   stackerBreak: "Stacker has been broken"

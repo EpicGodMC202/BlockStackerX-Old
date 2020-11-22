@@ -1,6 +1,7 @@
 package me.epicgodmc.blockstackerx;
 
 import jdk.internal.jline.internal.Nullable;
+import me.epicgodmc.blockstackerx.database.MySqlStorage;
 import me.epicgodmc.blockstackerx.database.StackerStorage;
 import me.epicgodmc.blockstackerx.database.sqlite.SQLite;
 import org.bukkit.Bukkit;
@@ -27,7 +28,21 @@ public class StackerStore
                         this.stackerStorage = sqLite;
                         BlockStackerX.logger.info("Storage Method was set to sqlite successfully");
                     }
-
+                    break;
+                case "mysql":
+                    try {
+                        MySqlStorage sql = new MySqlStorage(plugin);
+                        boolean success = sql.connect();
+                        if (success) {
+                            this.stackerStorage = sql;
+                            BlockStackerX.logger.info("Connected to mysql database successfully");
+                        }
+                        else storageSelectErrorCallback("Failed to connect to database");
+                    }catch (Exception e)
+                    {
+                        BlockStackerX.logger.info("Failed to connect to mysql database, using default json storage method");
+                    }
+                    break;
             }
         }
         if (plugin.getConfig().getBoolean("storage.autosave.enabled"))
@@ -37,6 +52,22 @@ public class StackerStore
         }
 
     }
+
+
+   private void storageSelectErrorCallback(String error)
+   {
+       BlockStackerX.logger.info(error+", Using SQLite Storage");
+       SQLite sqLite = new SQLite(plugin);
+       if (sqLite.load())
+       {
+           this.stackerStorage = sqLite;
+           BlockStackerX.logger.info("Storage Method was set to sqlite successfully");
+       }else{
+           BlockStackerX.logger.info("Failed to select a storage method, disabling plugin");
+           plugin.forceShutdown = true;
+           plugin.getPluginLoader().disablePlugin(plugin);
+       }
+   }
 
     private final HashMap<Location, StackerBlock> stackers = new HashMap<>();
 
@@ -92,6 +123,12 @@ public class StackerStore
         return stackerBlocks;
     }
 
+    public ArrayList<StackerBlock> sort()
+    {
+        ArrayList<StackerBlock> array = new ArrayList<>(stackers.values());
+        Collections.sort(array);
+        return array;
+    }
 
     private void startAutoSave()
     {

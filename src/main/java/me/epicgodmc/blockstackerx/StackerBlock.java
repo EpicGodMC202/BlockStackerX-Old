@@ -7,7 +7,7 @@ import org.bukkit.Material;
 
 import java.util.UUID;
 
-public class StackerBlock {
+public class StackerBlock implements Comparable<StackerBlock>{
 
     private final BlockStackerX plugin;
 
@@ -177,5 +177,12 @@ public class StackerBlock {
             this.stackMaterial = null;
             location.toBukkitLoc().getBlock().setType(plugin.getSettings().getDefaultMaterial(type));
         }
+    }
+
+    @Override
+    public int compareTo(StackerBlock o) {
+        if (this.value == o.value) return 0;
+        else if (this.value < o.value) return 1;
+        else return -1;
     }
 }

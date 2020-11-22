@@ -2,6 +2,7 @@ package me.epicgodmc.blockstackerx.commands;
 
 import me.epicgodmc.blockstackerx.BlockStackerX;
 import me.epicgodmc.blockstackerx.commands.sub.GiveCmd;
+import me.epicgodmc.blockstackerx.commands.sub.TopCmd;
 import me.epicgodmc.blockstackerx.enumerators.Permission;
 import me.epicgodmc.blockstackerx.utils.Utils;
 import me.epicgodmc.epicframework.command.ECommand;
@@ -66,6 +67,7 @@ public class BaseCommand extends ECommand {
         List<SubCommand> subCommands = new ArrayList<>();
 
         subCommands.add(new GiveCmd(plugin));
+        subCommands.add(new TopCmd(plugin));
 
         return subCommands;
     }

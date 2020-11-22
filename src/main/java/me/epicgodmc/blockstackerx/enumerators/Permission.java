@@ -14,6 +14,7 @@ public enum Permission
     STACKER_BREAK("breakStacker"),
     STACKER_ADD_BLOCKS("addBlocks"),
     STACKER_SUB_BLOCKS("subBlocks"),
+    TOP_STACKERS("topcmd"),
     STACKER_PLACE("placeStacker");
 
 

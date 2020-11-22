@@ -188,7 +188,8 @@ public class Utils {
 
     public static String getCmdUsage() {
         return new FancyMessage("&e&l<----------> &d&lBlockStackerX &e&l<---------->\n" +
-                "&f&l* &d/BlockStackerX give &8<&7Player&8> <&7Type&8> <&7Amount&8>", true).get();
+                "&f&l* &d/BlockStackerX give &8<&7Player&8> <&7Type&8> <&7Amount&8>\n" +
+                "&f&l* &d/BlockStackerX top", true).get();
     }
 
 }

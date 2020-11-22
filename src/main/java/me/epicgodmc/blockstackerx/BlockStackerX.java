@@ -28,7 +28,7 @@ public final class BlockStackerX extends JavaPlugin {
         return instance;
     }
 
-    private boolean forceShutdown = false;
+    public boolean forceShutdown = false;
 
     private FileManager fileManager;
     private Settings settings;

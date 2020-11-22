@@ -7,8 +7,16 @@ storage:
     enabled: true
     #How often autosave occurs in minutes
     interval: 1
-  #Supported methods are: sqlite,
+  #Supported methods are: sqlite, mysql
   method: "sqlite"
+
+  #Only relevant for storage method mysql:
+  mysql:
+    address: "127.0.0.1"
+    name: "database"
+    username: "user"
+    password: "pass"
+    port: 3306
 
 
 AutoSave: true
