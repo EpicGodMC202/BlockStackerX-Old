@@ -1,7 +1,8 @@
 package me.epicgodmc.blockstackerx;
 
+import lombok.Getter;
 import me.epicgodmc.blockstackerx.support.holograms.StackerHologram;
-import me.epicgodmc.epicframework.util.SimpleLocation;
+import me.epicgodmc.epicapi.util.SimpleLocation;
 import org.bukkit.Location;
 import org.bukkit.Material;
 
@@ -19,6 +20,9 @@ public class StackerBlock implements Comparable<StackerBlock>{
     private boolean hologramVisibility;
     private int value;
 
+    @Getter
+    private int sqlID;
+
     public StackerBlock(BlockStackerX plugin, UUID owner, String type, StackerHologram hologram, SimpleLocation location) {
         this.plugin = plugin;
         this.owner = owner;
@@ -29,7 +33,7 @@ public class StackerBlock implements Comparable<StackerBlock>{
         this.value = 0;
     }
 
-    public StackerBlock(BlockStackerX plugin, UUID owner, String type, StackerHologram hologram, SimpleLocation location, Material material, int value)
+    public StackerBlock(BlockStackerX plugin, int sqlID, UUID owner, String type, StackerHologram hologram, SimpleLocation location, Material material, int value)
     {
         this.plugin = plugin;
         this.owner = owner;
@@ -39,6 +43,7 @@ public class StackerBlock implements Comparable<StackerBlock>{
         setStackMaterial(material);
         this.value = value;
         this.hologramVisibility = true;
+        this.sqlID = sqlID;
     }
 
     public String getType() {
@@ -55,7 +60,7 @@ public class StackerBlock implements Comparable<StackerBlock>{
 
     public void setStackMaterial(Material stackMaterial) {
         if (stackMaterial == null) {
-            location.toBukkitLoc().getBlock().setType(plugin.getSettings().getDefaultMaterial(type));
+            location.toBukkitLoc().getBlock().setType(plugin.getStackerSettings().getDefaultMaterial(type));
             return;
         }
         this.stackMaterial = stackMaterial;
@@ -106,7 +111,7 @@ public class StackerBlock implements Comparable<StackerBlock>{
     public double calculateLevels()
     {
         if (this.stackMaterial != null) {
-            double matValue = plugin.getSettings().getWorth(this.stackMaterial);
+            double matValue = plugin.getWorthSettings().getWorth(this.stackMaterial);
             return (matValue * this.value);
         }
         return 0.0;
@@ -116,7 +121,7 @@ public class StackerBlock implements Comparable<StackerBlock>{
     {
         if (this.stackMaterial != null)
         {
-            return plugin.getSettings().getWorth(this.stackMaterial);
+            return plugin.getWorthSettings().getWorth(this.stackMaterial);
         }
         return 0.0;
     }
@@ -129,7 +134,7 @@ public class StackerBlock implements Comparable<StackerBlock>{
             this.hologramVisibility = false;
         } else {
             this.hologramVisibility = true;
-            float[] offset = plugin.getSettings().getDisplayOffset(this.type);
+            float[] offset = plugin.getStackerSettings().getDisplayOffset(this.type);
             Location l = this.location.toBukkitLoc().add(offset[0], offset[1], offset[2]);
             StackerHologram hologram = plugin.getDependencyManager().getNewHologram(plugin);
             hologram.create(this.type, this.value, l);
@@ -143,7 +148,7 @@ public class StackerBlock implements Comparable<StackerBlock>{
     }
 
     public int getStorageLeft() {
-        int max = plugin.getSettings().getMaxStorage(type);
+        int max = plugin.getStackerSettings().getMaxStorage(type);
         return max - this.value;
     }
 
@@ -152,7 +157,7 @@ public class StackerBlock implements Comparable<StackerBlock>{
     }
 
     public boolean canAddValue(int a) {
-        int max = plugin.getSettings().getMaxStorage(type);
+        int max = plugin.getStackerSettings().getMaxStorage(type);
         return this.value + a <= max;
     }
 
@@ -175,7 +180,7 @@ public class StackerBlock implements Comparable<StackerBlock>{
         if (value <= 0) {
             this.value = 0;
             this.stackMaterial = null;
-            location.toBukkitLoc().getBlock().setType(plugin.getSettings().getDefaultMaterial(type));
+            location.toBukkitLoc().getBlock().setType(plugin.getStackerSettings().getDefaultMaterial(type));
         }
     }
 

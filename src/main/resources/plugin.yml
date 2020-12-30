@@ -1,6 +1,7 @@
 name: BlockStackerX
 version: ${project.version}
 main: me.epicgodmc.blockstackerx.BlockStackerX
+depend: [ EpicAPI ]
 softdepend: [ASkyBlock, Holograms, HolographicDisplays, WorldGuard, BentoBox]
 authors: [ EpicGodMC ]
 api-version: 1.13

@@ -22,7 +22,7 @@ public class Holograms implements StackerHologram {
 
     @Override
     public void create(String type, int value, Location location) {
-        String name = plugin.getSettings().getValueFormat(type, value);
+        String name = plugin.getStackerSettings().getValueFormat(type, value);
         Hologram hologram = new Hologram("BlockStackerX", location);
         hologram.setPersistent(false);
         HologramLine line = new TextLine(hologram, name);
@@ -35,7 +35,7 @@ public class Holograms implements StackerHologram {
     @Override
     public void update(String type, int value) {
         Hologram hologram = (Hologram) hologramObject;
-        String name = plugin.getSettings().getValueFormat(type, value);
+        String name = plugin.getStackerSettings().getValueFormat(type, value);
         HologramLine line = new TextLine(hologram, name);
         hologram.removeLine(hologram.getLine(0));
         hologram.addLine(line, 0);

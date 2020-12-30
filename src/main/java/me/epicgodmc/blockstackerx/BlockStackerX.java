@@ -1,21 +1,23 @@
 package me.epicgodmc.blockstackerx;
 
-import jdk.internal.jline.internal.Nullable;
-import me.epicgodmc.blockstackerx.commands.BaseCommand;
+import lombok.Getter;
+import me.epicgodmc.blockstackerx.commands.CommandRoot;
+import me.epicgodmc.blockstackerx.config.GuiSettings;
+import me.epicgodmc.blockstackerx.config.LangSettings;
+import me.epicgodmc.blockstackerx.config.StackerSettings;
+import me.epicgodmc.blockstackerx.config.WorthSettings;
 import me.epicgodmc.blockstackerx.inventory.GuiManager;
 import me.epicgodmc.blockstackerx.listeners.StackerInteractEvent;
 import me.epicgodmc.blockstackerx.listeners.StackerPlaceEvent;
 import me.epicgodmc.blockstackerx.listeners.StackerRemoveEvent;
-import me.epicgodmc.blockstackerx.utils.Settings;
-import me.epicgodmc.epicframework.EpicFramework;
-import me.epicgodmc.epicframework.command.CommandManager;
-import me.epicgodmc.epicframework.file.FileManager;
-import me.epicgodmc.epicframework.file.LangManager;
-import me.epicgodmc.epicframework.inventory.GuiPage;
+import me.epicgodmc.epicapi.command.CommandManager;
+import me.epicgodmc.epicapi.inventory.MenuRegistrar;
+import me.epicgodmc.epicapi.storage.shaded.jetbrains.annotations.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public final class BlockStackerX extends JavaPlugin {
@@ -30,14 +32,24 @@ public final class BlockStackerX extends JavaPlugin {
 
     public boolean forceShutdown = false;
 
-    private FileManager fileManager;
-    private Settings settings;
-    private LangManager langManager;
+    @Getter
+    private StackerSettings stackerSettings;
+    @Getter
+    private WorthSettings worthSettings;
+    @Getter
+    private GuiSettings guiSettings;
+    @Getter
+    private LangSettings langSettings;
+    @Getter
+    private MenuRegistrar menuRegistrar;
+    @Getter
     private StackerStore stackerStore;
+    @Getter
     private DependencyManager dependencyManager;
-    private EpicFramework framework;
-    private CommandManager commandManager;
+    @Getter
     private GuiManager guiManager;
+    @Getter
+    private CommandManager commandManager;
 
     @Override
     public void onEnable() {
@@ -46,17 +58,28 @@ public final class BlockStackerX extends JavaPlugin {
             logLogo();
             instance = this;
             dependencyManager.logHooks();
-            saveDefaultConfig();
-            instantiateClasses();
-            saveConfigDefaults();
+            try {
+                instantiateClasses();
+            } catch (InstantiationException e) {
+                logger.log(Level.SEVERE, "Could not instantiate menuRegistrar", e);
+                shutDown();
+            }
             registerCommands();
-            getStackerStore().getStackerStorage().loadStackers();
-            framework.setPluginPrefix(fileManager.getLangFile().get().getString("prefix"));
+            Bukkit.getScheduler().runTaskLaterAsynchronously(this, task ->
+            {
+                getStackerStore().getStackerStorage().loadStackers();
+            }, 40L);
+
         } else {
-            Bukkit.getScheduler().cancelTasks(this);
-            Bukkit.getPluginManager().disablePlugin(this);
+            shutDown();
         }
         logger.info("==================================================================");
+    }
+
+    private void shutDown() {
+        this.forceShutdown = true;
+        Bukkit.getScheduler().cancelTasks(this);
+        Bukkit.getPluginManager().disablePlugin(this);
     }
 
     @Override
@@ -69,26 +92,24 @@ public final class BlockStackerX extends JavaPlugin {
         }
         logger.info("==================================================================");
         logger.info("Saving data");
-        getStackerStore().getStackerStorage().saveStackers(getStackerStore().getStackers(), true);
+        if (getStackerStore().getStackerStorage() != null) {
+            getStackerStore().getStackerStorage().saveStackers(getStackerStore().getStackers(), true);
+        }
         logger.info("Finalizing");
-        GuiPage.onDisable();
         instance = null;
         logger.info("==================================================================");
     }
 
-    private void saveConfigDefaults() {
-        getFileManager().getConfig("gui.yml").saveDefaultConfig();
-        getFileManager().getConfig("worth.yml").saveDefaultConfig();
-    }
-
-    private void instantiateClasses() {
-        framework = new EpicFramework(this);
-        this.fileManager = framework.getFileManager();
-        this.commandManager = framework.getCommandManager();
-        this.settings = new Settings(this, this.getConfig());
-        this.langManager = new LangManager(this);
+    private void instantiateClasses() throws InstantiationException {
+        this.worthSettings = new WorthSettings(this);
+        this.stackerSettings = new StackerSettings(this);
+        this.guiSettings = new GuiSettings(this);
+        this.langSettings = new LangSettings(this, this.stackerSettings.getLang());
+        logger.info("Loaded configurations");
+        this.commandManager = new CommandManager(this);
         this.stackerStore = new StackerStore(this);
         this.guiManager = new GuiManager(this);
+        this.menuRegistrar = new MenuRegistrar(this);
         new StackerPlaceEvent(this);
         new StackerRemoveEvent(this);
         new StackerInteractEvent(this);
@@ -100,41 +121,13 @@ public final class BlockStackerX extends JavaPlugin {
     }
 
     private void registerCommands() {
-        commandManager.registerCommand(new BaseCommand(this));
+        commandManager.registerCommand(new CommandRoot(this));
         logger.info("Started command manager");
     }
 
     public void registerListener(Listener listener, @Nullable String job) {
         if (job != null) logger.info("Registering new listener, Job=(" + job + ")");
         this.getServer().getPluginManager().registerEvents(listener, this);
-    }
-
-    public EpicFramework getFramework() {
-        return framework;
-    }
-
-    public DependencyManager getDependencyManager() {
-        return dependencyManager;
-    }
-
-    public StackerStore getStackerStore() {
-        return stackerStore;
-    }
-
-    public Settings getSettings() {
-        return settings;
-    }
-
-    public LangManager getLangManager() {
-        return langManager;
-    }
-
-    public FileManager getFileManager() {
-        return fileManager;
-    }
-
-    public GuiManager getGuiManager() {
-        return guiManager;
     }
 
     private void logLogo() {

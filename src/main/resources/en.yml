@@ -13,6 +13,7 @@ messages:
   targetNotFound: "The player '%s' could not be found"
   subCommandNotFound: "The Subcommand '%s' could not be found"
   error: "An unexpected error occurred"
+  noPermission: "You dont have permission!"
   cmdNoPermission: "You need '%1' or '%2' to execute this command"
   materialChosen: "You have chosen to stack '%s' in this stacker"
   valueAdded: "Added '%1' '%2' block's to the stacker"
@@ -21,4 +22,5 @@ messages:
   minStorageReached: "This Stacked is empty!"
   materialNoMatch: "This stacker is already stacking '%s' block's"
   invalidBlock: "You cannot stack this block"
+  consoleNotFound: "For security reasons this command must be ran from your console"
   inventoryFull: "Please make some inventory space first!"

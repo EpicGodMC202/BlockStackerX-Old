@@ -1,52 +1,47 @@
 package me.epicgodmc.blockstackerx;
 
-import jdk.internal.jline.internal.Nullable;
-import me.epicgodmc.blockstackerx.database.MySqlStorage;
 import me.epicgodmc.blockstackerx.database.StackerStorage;
+import me.epicgodmc.blockstackerx.database.impl.MySqlStorage;
 import me.epicgodmc.blockstackerx.database.sqlite.SQLite;
+import me.epicgodmc.epicapi.storage.shaded.jetbrains.annotations.Nullable;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class StackerStore
-{
+public class StackerStore {
 
     private StackerStorage stackerStorage;
     private final BlockStackerX plugin;
-    public StackerStore(BlockStackerX plugin)
-    {
+
+    public StackerStore(BlockStackerX plugin) {
         this.plugin = plugin;
         String storageMethod = plugin.getConfig().getString("storage.method");
         if (storageMethod != null) {
             switch (storageMethod) {
                 case "sqlite":
                     SQLite sqLite = new SQLite(plugin);
-                    if (sqLite.load())
-                    {
+                    if (sqLite.load()) {
                         this.stackerStorage = sqLite;
                         BlockStackerX.logger.info("Storage Method was set to sqlite successfully");
                     }
                     break;
                 case "mysql":
                     try {
-                        MySqlStorage sql = new MySqlStorage(plugin);
-                        boolean success = sql.connect();
+                        MySqlStorage mySqlStorage = new MySqlStorage();
+                        boolean success = mySqlStorage.connectMySQL(plugin, "mysql");
                         if (success) {
-                            this.stackerStorage = sql;
+                            this.stackerStorage = mySqlStorage;
                             BlockStackerX.logger.info("Connected to mysql database successfully");
-                        }
-                        else storageSelectErrorCallback("Failed to connect to database");
-                    }catch (Exception e)
-                    {
+                        } else storageSelectErrorCallback("Failed to connect to database");
+                    } catch (Exception e) {
                         BlockStackerX.logger.info("Failed to connect to mysql database, using default json storage method");
                     }
                     break;
             }
         }
-        if (plugin.getConfig().getBoolean("storage.autosave.enabled"))
-        {
+        if (plugin.getConfig().getBoolean("storage.autosave.enabled")) {
             startAutoSave();
             BlockStackerX.logger.info("Initiated autosave clock");
         }
@@ -54,41 +49,39 @@ public class StackerStore
     }
 
 
-   private void storageSelectErrorCallback(String error)
-   {
-       BlockStackerX.logger.info(error+", Using SQLite Storage");
-       SQLite sqLite = new SQLite(plugin);
-       if (sqLite.load())
-       {
-           this.stackerStorage = sqLite;
-           BlockStackerX.logger.info("Storage Method was set to sqlite successfully");
-       }else{
-           BlockStackerX.logger.info("Failed to select a storage method, disabling plugin");
-           plugin.forceShutdown = true;
-           plugin.getPluginLoader().disablePlugin(plugin);
-       }
-   }
+    private void storageSelectErrorCallback(String error) {
+        BlockStackerX.logger.info(error + ", Using SQLite Storage");
+        SQLite sqLite = new SQLite(plugin);
+        if (sqLite.load()) {
+            this.stackerStorage = sqLite;
+            BlockStackerX.logger.info("Storage Method was set to sqlite successfully");
+        } else {
+            BlockStackerX.logger.info("Failed to select a storage method, disabling plugin");
+            plugin.forceShutdown = true;
+            plugin.getPluginLoader().disablePlugin(plugin);
+        }
+    }
 
-    private final HashMap<Location, StackerBlock> stackers = new HashMap<>();
+    private HashMap<Location, StackerBlock> stackers = new HashMap<>();
 
-    public void setStack(Location l, StackerBlock b)
-    {
+    public void setStack(Location l, StackerBlock b) {
         stackers.putIfAbsent(l, b);
     }
 
-    public void removeStack(Location l)
-    {
+    public void removeStack(Location l) {
         getStackerStorage().removeStacker(stackers.get(l));
         stackers.remove(l);
     }
 
-    public boolean contains(Location l)
-    {
+    public void setStackerStorage(HashMap<Location, StackerBlock> stackerStorage) {
+        this.stackers = stackerStorage;
+    }
+
+    public boolean contains(Location l) {
         return stackers.containsKey(l);
     }
 
-    public StackerBlock getStacker(Location l)
-    {
+    public StackerBlock getStacker(Location l) {
         return stackers.get(l);
     }
 
@@ -104,8 +97,7 @@ public class StackerStore
         return stackerStorage;
     }
 
-    public HashMap<Location, StackerBlock> collectStackers(@Nullable UUID requester, Collection<UUID> team)
-    {
+    public HashMap<Location, StackerBlock> collectStackers(@Nullable UUID requester, Collection<UUID> team) {
         HashMap<Location, StackerBlock> stackerBlocks = new HashMap<>();
 
         if (requester != null) {
@@ -113,25 +105,21 @@ public class StackerStore
                 stackerBlocks.putIfAbsent(ownerStacks.getLocation().toBukkitLoc(), ownerStacks);
             }
         }
-        for (UUID uuid : team)
-        {
-            for (StackerBlock stacker : getStackersOf(uuid))
-            {
+        for (UUID uuid : team) {
+            for (StackerBlock stacker : getStackersOf(uuid)) {
                 stackerBlocks.putIfAbsent(stacker.getLocation().toBukkitLoc(), stacker);
             }
         }
         return stackerBlocks;
     }
 
-    public ArrayList<StackerBlock> sort()
-    {
+    public ArrayList<StackerBlock> sort() {
         ArrayList<StackerBlock> array = new ArrayList<>(stackers.values());
         Collections.sort(array);
         return array;
     }
 
-    private void startAutoSave()
-    {
+    private void startAutoSave() {
         long delay = (plugin.getConfig().getLong("storage.autosave.interval") * 20) * 60;
         Bukkit.getScheduler().runTaskTimerAsynchronously(plugin, task -> {
             getStackerStorage().saveStackers(this.stackers, false);

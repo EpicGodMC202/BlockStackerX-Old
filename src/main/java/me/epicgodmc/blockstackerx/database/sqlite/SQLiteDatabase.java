@@ -3,11 +3,12 @@ package me.epicgodmc.blockstackerx.database.sqlite;
 import me.epicgodmc.blockstackerx.BlockStackerX;
 import me.epicgodmc.blockstackerx.StackerBlock;
 import me.epicgodmc.blockstackerx.database.StackerStorage;
+import me.epicgodmc.blockstackerx.database.model.StackerModel;
 import me.epicgodmc.blockstackerx.support.holograms.StackerHologram;
-import me.epicgodmc.epicframework.database.SQLiteError;
-import me.epicgodmc.epicframework.database.SQLiteErrors;
-import me.epicgodmc.epicframework.item.XMaterial;
-import me.epicgodmc.epicframework.util.SimpleLocation;
+import me.epicgodmc.epicapi.errors.SQLiteError;
+import me.epicgodmc.epicapi.errors.SQLiteErrors;
+import me.epicgodmc.epicapi.item.XMaterial;
+import me.epicgodmc.epicapi.util.SimpleLocation;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 
@@ -15,8 +16,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.logging.Level;
 
 public abstract class SQLiteDatabase implements StackerStorage {
@@ -130,6 +130,66 @@ public abstract class SQLiteDatabase implements StackerStorage {
     }
 
     @Override
+    public List<StackerModel> getStackers() {
+        Map<Location, StackerBlock> map = new HashMap<>();
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, task -> {
+            establishConnection();
+            PreparedStatement ps = null;
+            int count = 0;
+
+            try {
+                conn = getSQLConnection();
+                ps = conn.prepareStatement("SELECT * FROM " + table);
+                ResultSet rs = ps.executeQuery();
+
+                while (rs.next()) {
+                    count++;
+                    UUID owner = UUID.fromString(rs.getString("owner"));
+                    String type = rs.getString("type");
+                    SimpleLocation location = new SimpleLocation(rs.getString("location"));
+                    XMaterial xMaterial = XMaterial.valueOf(rs.getString("material").toUpperCase());
+                    int value = rs.getInt("value");
+
+
+                    Bukkit.getScheduler().runTask(plugin, syncedtask -> {
+                        float[] offset = plugin.getStackerSettings().getDisplayOffset(type);
+                        Location hologramLocation = location.toBukkitLoc().add(offset[0], offset[1], offset[2]);
+                        StackerHologram hologram = plugin.getDependencyManager().getNewHologram(plugin);
+                        hologram.create(type, value, hologramLocation);
+                        map.put(location.toBukkitLoc(), new StackerBlock(plugin, 0, owner, type, hologram, location, xMaterial.parseMaterial(), value));
+                    });
+                }
+                BlockStackerX.logger.info("Found a total of " + count + " stackers in sqlite database");
+            } catch (SQLException e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (ps != null) ps.close();
+                    closeConn();
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        return new ArrayList<>();
+    }
+
+    @Override
+    public void clearData() {
+        Bukkit.getScheduler().runTaskAsynchronously(plugin, task -> {
+            establishConnection();
+            PreparedStatement ps = null;
+
+            try {
+                ps = conn.prepareStatement("TRUNCATE TABLE " + table);
+                ps.executeUpdate();
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    @Override
     public void loadStackers() {
         Bukkit.getScheduler().runTaskAsynchronously(plugin, task -> {
             establishConnection();
@@ -150,11 +210,11 @@ public abstract class SQLiteDatabase implements StackerStorage {
                     int value = rs.getInt("value");
 
                     Bukkit.getScheduler().runTask(plugin, syncedtask -> {
-                        float[] offset = plugin.getSettings().getDisplayOffset(type);
+                        float[] offset = plugin.getStackerSettings().getDisplayOffset(type);
                         Location hologramLocation = location.toBukkitLoc().add(offset[0], offset[1], offset[2]);
                         StackerHologram hologram = plugin.getDependencyManager().getNewHologram(plugin);
                         hologram.create(type, value, hologramLocation);
-                        plugin.getStackerStore().setStack(location.toBukkitLoc(), new StackerBlock(plugin, owner, type, hologram, location, xMaterial.parseMaterial(), value));
+                        plugin.getStackerStore().setStack(location.toBukkitLoc(), new StackerBlock(plugin, 0, owner, type, hologram, location, xMaterial.parseMaterial(), value));
                     });
                 }
                 BlockStackerX.logger.info("BlockStackerX: Loaded a total of " + count + " stackers from sqlite database");
@@ -167,7 +227,6 @@ public abstract class SQLiteDatabase implements StackerStorage {
                 } catch (SQLException e) {
                     e.printStackTrace();
                 }
-
             }
         });
     }
@@ -176,11 +235,10 @@ public abstract class SQLiteDatabase implements StackerStorage {
     public void saveStackers(Map<Location, StackerBlock> stackers, boolean onDisable) {
         if (!onDisable) {
             Bukkit.getScheduler().runTaskAsynchronously(plugin, task -> saveStackers(stackers));
-        }else saveStackers(stackers);
+        } else saveStackers(stackers);
     }
 
-    private void saveStackers(Map<Location, StackerBlock> stackers)
-    {
+    private void saveStackers(Map<Location, StackerBlock> stackers) {
         establishConnection();
         try {
             conn.setAutoCommit(false);

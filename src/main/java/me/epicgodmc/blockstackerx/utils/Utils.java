@@ -1,8 +1,8 @@
 package me.epicgodmc.blockstackerx.utils;
 
-import me.epicgodmc.epicframework.chat.FancyMessage;
-import me.epicgodmc.epicframework.item.XMaterial;
-import me.epicgodmc.epicframework.nbt.NBTItem;
+import me.epicgodmc.epicapi.chat.Message;
+import me.epicgodmc.epicapi.item.XMaterial;
+import me.epicgodmc.epicapi.nbt.NBTItem;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
@@ -187,9 +187,12 @@ public class Utils {
 
 
     public static String getCmdUsage() {
-        return new FancyMessage("&e&l<----------> &d&lBlockStackerX &e&l<---------->\n" +
-                "&f&l* &d/BlockStackerX give &8<&7Player&8> <&7Type&8> <&7Amount&8>\n" +
-                "&f&l* &d/BlockStackerX top", true).get();
+        return new Message("&e&l<----------> &d&lBlockStackerX &e&l<---------->\n" +
+                "&f&l* &d/BlockStackerX Give &8<&7Player&8> <&7Type&8> <&7Amount&8>\n" +
+                "&f&l* &d/BlockStackerX Top\n" +
+                "&f&l* &d/BlockStackerX SyncData\n" +
+                "&f&l* &d/BlockStackerX list\n" +
+                "&e&l<----------------------------------->").getText();
     }
 
 }

@@ -3,14 +3,12 @@ package me.epicgodmc.blockstackerx.commands.sub;
 import me.epicgodmc.blockstackerx.BlockStackerX;
 import me.epicgodmc.blockstackerx.enumerators.Permission;
 import me.epicgodmc.blockstackerx.utils.Utils;
-import me.epicgodmc.epicframework.chat.FancyMessage;
-import me.epicgodmc.epicframework.command.SubCommand;
+
+import me.epicgodmc.epicapi.chat.Message;
+import me.epicgodmc.epicapi.command.SubCommand;
 import org.bukkit.command.CommandSender;
-import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 public class GiveCmd extends SubCommand {
 
@@ -32,34 +30,17 @@ public class GiveCmd extends SubCommand {
                     String type = args[1];
                     int amount = Utils.parseInteger(args[2]);
                     if (amount != -1) {
-                        if (plugin.getSettings().stackerTypeExists(type)) {
-                            ItemStack stacker = plugin.getSettings().getStacker(type).addStringTag("stackerType", type).amount(amount).build();
+                        if (plugin.getStackerSettings().stackerExists(type)) {
+                            ItemStack stacker = plugin.getStackerSettings().getStacker(type).addStringTag("stackerType", type).setAmount(amount).build();
                             if (Utils.hasAvailableSlot(target, stacker, amount)) {
-                                if (plugin.getSettings().doGlow(type)) {
-                                    ItemMeta meta = stacker.getItemMeta();
-                                    meta.addEnchant(Enchantment.LUCK, 1, true);
-                                    meta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-                                    stacker.setItemMeta(meta);
-                                }
                                 target.getInventory().addItem(stacker);
-                            } else {
-                                plugin.getLangManager().getText("targetNoInventorySpace").replaceText("%s", target.getName()).send(player, true);
-                            }
-                        } else {
-                            plugin.getLangManager().getText("stackerNotFound").replaceText("%s", type).send(player, true);
-                        }
-                    } else {
-                        plugin.getLangManager().getText("couldNotParseNumeric").replaceText("%s", args[2]).send(player, true);
-                    }
-                } else {
-                    plugin.getLangManager().getText("targetNotFound").replaceText("%s", args[0]).send(player, true);
-                }
-            } else {
-                new FancyMessage(info(), true).send(commandSender, false);
-            }
-        } else {
-            plugin.getLangManager().getText("onlyPlayers").send(commandSender, false);
-        }
+                            } else plugin.getLangSettings().getText("targetNoInventorySpace", true).addPlaceHolder("%s", target.getName()).send(player);
+                        } else plugin.getLangSettings().getText("stackerNotFound", true).addPlaceHolder("%s", type).send(player);
+                    } else plugin.getLangSettings().getText("couldNotParseNumeric", true).addPlaceHolder("%s", args[2]).send(player);
+                } else plugin.getLangSettings().getText("targetNotFound", true).addPlaceHolder("%s", args[0]).send(player);
+            } else new Message(info()).send(commandSender);
+        } else plugin.getLangSettings().sendText(commandSender, "onlyPlayers", false);
+
     }
 
     @Override
@@ -70,6 +51,11 @@ public class GiveCmd extends SubCommand {
     @Override
     public String requiredPermission() {
         return Permission.STACKER_GIVE.getNode();
+    }
+
+    @Override
+    public boolean isPlayerCmd() {
+        return false;
     }
 
     @Override

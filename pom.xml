@@ -18,6 +18,10 @@
 
 
     <repositories>
+        <repository>
+            <id>lib</id>
+            <url>file://${project.basedir}/lib</url>
+        </repository>
 
        <repository>
             <id>spigot-repo</id>
@@ -30,19 +34,9 @@
         </repository>
 
         <repository>
-            <id>codemc-repo</id>
-            <url>https://repo.codemc.org/repository/maven-public/</url>
-        </repository>
-
-        <repository>
             <id>bintray-tastybento-maven-repo</id>
             <name>bintray</name>
             <url>http://dl.bintray.com/tastybento/maven-repo</url>
-        </repository>
-
-        <repository>
-            <id>lib</id>
-            <url>file://D:/APIS/maven</url>
         </repository>
 
     </repositories>
@@ -85,18 +79,17 @@
         </dependency>
 
         <dependency>
-            <groupId>com.zaxxer</groupId>
-            <artifactId>HikariCP</artifactId>
-            <version>3.4.5</version>
+            <groupId>me.epicgodmc</groupId>
+            <artifactId>epicapi</artifactId>
+            <version>1.2.3</version>
         </dependency>
 
         <dependency>
-            <groupId>me.epicgodmc</groupId>
-            <artifactId>epicframework</artifactId>
-            <version>3.2</version>
-            <scope>compile</scope>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.10</version>
+            <scope>provided</scope>
         </dependency>
-
     </dependencies>
 
     <build>
@@ -105,7 +98,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.2.1</version>
+                <version>3.2.4</version>
                 <executions>
                     <execution>
                         <id>shade</id>
@@ -125,7 +118,7 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>2.3.1</version>
                 <configuration>
-                    <outputDirectory>C:\Users\Bert Garretsen\Desktop\TestServers\TestServer 1.16.4\plugins</outputDirectory>
+                    <outputDirectory>C:\Users\bertg\Desktop\TestServer 1.16.4\plugins</outputDirectory>
                 </configuration>
             </plugin>
 

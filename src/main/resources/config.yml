@@ -1,4 +1,4 @@
-langFile: "English.yml"
+langFile: "en.yml"
 
 storage:
   #AutoSave options
@@ -27,15 +27,17 @@ global:
 
 stackers:
   example:
+    item:
+      material: "IRON_BLOCK"
+      name: "&d&lExample Stacker"
+      glowing: true
+      metadata: 0
+      lore:
+        - '&1line1'
+        - '&2line2'
+        - '&3line3'
     gui: "example"
     displayOffset: "0.5,1.7,0.5"
-    blockType: "IRON_BLOCK"
-    displayName: "&d&lExample Stacker"
-    glow: true
-    lore:
-      - '&1line1'
-      - '&2line2'
-      - '&3line3'
     valueFormat: "&d&l%value%"
     maxStorage: 1000
     teamStacking: false
@@ -44,7 +46,7 @@ stackers:
       - 'EMERALD_BLOCK'
       - 'IRON_BLOCK'
     stackerItem:
-      displayName: "&d&lExample Stacker"
+      name: "&d&lExample Stacker"
       glow: false
       lore:
         - '&e&l========================='

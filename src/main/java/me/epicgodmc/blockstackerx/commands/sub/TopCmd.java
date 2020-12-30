@@ -3,7 +3,7 @@ package me.epicgodmc.blockstackerx.commands.sub;
 import me.epicgodmc.blockstackerx.BlockStackerX;
 import me.epicgodmc.blockstackerx.StackerBlock;
 import me.epicgodmc.blockstackerx.enumerators.Permission;
-import me.epicgodmc.epicframework.command.SubCommand;
+import me.epicgodmc.epicapi.command.SubCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
@@ -25,17 +25,19 @@ public class TopCmd extends SubCommand {
 
     private void sendTopTen(CommandSender sender, ArrayList<StackerBlock> sorted)
     {
-        plugin.getLangManager().getText("stackerTopHeader").send(sender, false);
-        for (int i = 0; i < 10; i++) {
-            if (i <= sorted.size()) {
-                plugin.getLangManager()
-                        .getText("stackerTopFormat")
-                        .replaceInteger("%1", i+1)
-                        .replaceText("%2", Bukkit.getOfflinePlayer(sorted.get(i).getOwner()).getName())
-                        .replaceInteger("%3", sorted.get(i).getValue()).send(sender, false);
-            }else break;
+        plugin.getLangSettings().sendText(sender, "stackerTopHeader", false);
+        if (sorted.size() != 0) {
+            for (int i = 0; i < 10; i++) {
+                if (i <= sorted.size()) {
+                    plugin.getLangSettings().getText("stackerTopFormat", false)
+                            .addPlaceHolder("%1", i +1)
+                            .addPlaceHolder("%2", Bukkit.getOfflinePlayer(sorted.get(i).getOwner()).getName())
+                            .addPlaceHolder("%3", sorted.get(i).getValue())
+                            .send(sender);
+                } else break;
+            }
         }
-        plugin.getLangManager().getText("stackerTopFooter").send(sender, false);
+        plugin.getLangSettings().sendText(sender, "stackerTopFooter", false);
     }
 
     @Override
@@ -46,6 +48,11 @@ public class TopCmd extends SubCommand {
     @Override
     public String requiredPermission() {
         return Permission.TOP_STACKERS.getNode();
+    }
+
+    @Override
+    public boolean isPlayerCmd() {
+        return false;
     }
 
     @Override

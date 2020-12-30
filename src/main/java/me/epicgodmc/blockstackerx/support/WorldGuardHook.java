@@ -1,7 +1,7 @@
 package me.epicgodmc.blockstackerx.support;
 
 import me.epicgodmc.blockstackerx.BlockStackerX;
-import me.epicgodmc.epicframework.util.NmsMethods;
+import me.epicgodmc.epicapi.util.ReflectionUtils;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 
@@ -14,7 +14,7 @@ public class WorldGuardHook {
     }
 
     public boolean canBuild(Player player, Location location) {
-        return NmsMethods.canBuild(player, location);
+        return ReflectionUtils.canBuild(player, location);
     }
 
 }

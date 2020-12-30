@@ -13,6 +13,7 @@ public enum Permission
     BYPASS("bypass"),
     STACKER_BREAK("breakStacker"),
     STACKER_ADD_BLOCKS("addBlocks"),
+    STACKER_LIST("list"),
     STACKER_SUB_BLOCKS("subBlocks"),
     TOP_STACKERS("topcmd"),
     STACKER_PLACE("placeStacker");
@@ -25,13 +26,13 @@ public enum Permission
     }
 
     public String getNode() {
-        return "dungeons." + node;
+        return "bs." + node;
     }
 
     public boolean has(CommandSender sender, BlockStackerX plugin) {
         boolean has = sender.hasPermission(getNode()) || sender.hasPermission("bs.*");
         if (!has) {
-            BlockStackerX.inst().getLangManager().getText("cmdNoPermission").send(sender, true);
+            BlockStackerX.inst().getLangSettings().sendText(sender, "cmdNoPermission", true);
         }
         return has;
     }
@@ -39,7 +40,7 @@ public enum Permission
     public boolean has(CommandSender sender, boolean informSender) {
         boolean has = sender.hasPermission(getNode()) || sender.hasPermission("bs.*");
         if (!has && informSender) {
-            BlockStackerX.inst().getLangManager().getText("cmdNoPermission").send(sender, true);
+            BlockStackerX.inst().getLangSettings().sendText(sender, "cmdNoPermission", true);
         }
         return has;
     }

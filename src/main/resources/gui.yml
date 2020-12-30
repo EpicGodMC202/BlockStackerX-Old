@@ -1,33 +1,33 @@
 guis:
   example:
     title: "&dExample &e%s"
-    rows: 3
+    slots: 27
     fill:
-      itemType: "STAINED_GLASS_PANE"
-      damage: 0
-      displayName: "&1"
+      material: "STAINED_GLASS_PANE"
+      metadata: 0
+      name: "&1"
       lore:
         - ''
     border:
-      itemType: "STAINED_GLASS_PANE"
-      damage: 15
-      displayName: "&1"
+      material: "STAINED_GLASS_PANE"
+      metadata: 15
+      name: "&1"
       lore:
         - ''
     buttons:
       pickup:
         position: 11
-        itemType: "BARRIER"
-        displayName: "&d&lPickup"
-        damage: 0
+        material: "BARRIER"
+        name: "&d&lPickup"
+        metadata: 0
         lore:
           - ''
           - '&7Click to pick this stacker up'
       information:
         position: 12
-        itemType: "BOOK"
-        displayName: "&d&lInformation"
-        damage: 0
+        material: "BOOK"
+        name: "&d&lInformation"
+        metadata: 0
         lore:
           - ''
           - '&7Owned by: &d%1'
@@ -36,25 +36,25 @@ guis:
           - '&7Material Value: &d%4'
       deposit-inv:
         position: 13
-        itemType: "DIAMOND_BLOCK"
-        displayName: "&d&lDeposit All"
-        damage: 0
+        material: "DIAMOND_BLOCK"
+        name: "&d&lDeposit All"
+        metadata: 0
         lore:
           - ''
           - '&7Click to deposit all matching blocks into stacker'
       withdraw-inv:
         position: 14
-        itemType: "IRON_BLOCK"
-        displayName: "&d&lFill Inventory"
-        damage: 0
+        material: "IRON_BLOCK"
+        name: "&d&lFill Inventory"
+        metadata: 0
         lore:
           - ''
           - '&7Click to withdraw as much blocks as your inventory can hold'
       toggle-hologram:
         position: 15
-        itemType: "REDSTONE_TORCH_ON"
-        displayName: "&d&lToggle Hologram"
-        damage: 0
+        material: "REDSTONE_TORCH_ON"
+        name: "&d&lToggle Hologram"
+        metadata: 0
         lore:
           - ''
           - '&7Click to toggle hologram on/off'

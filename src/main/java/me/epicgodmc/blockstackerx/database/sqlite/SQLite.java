@@ -1,6 +1,7 @@
 package me.epicgodmc.blockstackerx.database.sqlite;
 
 import me.epicgodmc.blockstackerx.BlockStackerX;
+import me.epicgodmc.epicapi.sqlibrary.database.DatabaseConnection;
 
 import java.io.File;
 import java.io.IOException;
@@ -74,4 +75,27 @@ public class SQLite extends SQLiteDatabase
         return true;
     }
 
+    @Override
+    public DatabaseConnection getSqlConnection() {
+        return null;
+    }
+
+    @Override
+    public void disconnect() {
+        try{
+            if (!this.getSQLConnection().isClosed())
+            {
+                this.getSQLConnection().close();
+            }
+        }catch (Exception e)
+        {
+
+        }
+
+    }
+
+    @Override
+    public String getStorageType() {
+        return "sqlite";
+    }
 }

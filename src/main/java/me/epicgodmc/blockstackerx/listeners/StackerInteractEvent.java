@@ -1,9 +1,9 @@
 package me.epicgodmc.blockstackerx.listeners;
 
 import me.epicgodmc.blockstackerx.BlockStackerX;
-import me.epicgodmc.blockstackerx.enumerators.Permission;
 import me.epicgodmc.blockstackerx.StackerBlock;
-import me.epicgodmc.blockstackerx.utils.Settings;
+import me.epicgodmc.blockstackerx.config.StackerSettings;
+import me.epicgodmc.blockstackerx.enumerators.Permission;
 import me.epicgodmc.blockstackerx.utils.Utils;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -17,11 +17,11 @@ import org.bukkit.inventory.ItemStack;
 public class StackerInteractEvent implements Listener {
 
     private final BlockStackerX plugin;
-    private final Settings settings;
+    private final StackerSettings settings;
 
     public StackerInteractEvent(BlockStackerX plugin) {
         this.plugin = plugin;
-        this.settings = plugin.getSettings();
+        this.settings = plugin.getStackerSettings();
 
         plugin.registerListener(this, "Handle Stacker Interaction");
     }
@@ -54,48 +54,61 @@ public class StackerInteractEvent implements Listener {
                 e.setCancelled(true);
                 Material material = hand.getType();
                 if (Permission.STACKER_ADD_BLOCKS.has(e.getPlayer(), false)) {
-                    if (plugin.getSettings().getAvailableMaterials(stacker.getType()).contains(material)) {
+                    if (plugin.getStackerSettings().getAvailableMaterials(stacker.getType()).contains(material)) {
                         if (!Utils.isStacker(hand)) {
                             if (plugin.getDependencyManager().getSkyblockHook().canModifyStacker(stacker, e.getPlayer())) {
                                 if (stacker.getValue() == 0) {
                                     stacker.setStackMaterial(material);
-                                    plugin.getLangManager().getText("materialChosen").replaceText("%s", material.toString().toLowerCase()).send(e.getPlayer(), true);
+                                    plugin.getLangSettings().getText("materialChosen", true)
+                                            .addPlaceHolder("%s", material.toString().toLowerCase())
+                                            .send(e.getPlayer());
                                 }
                                 if (stacker.getStackMaterial().equals(material)) {
                                     if (!e.getPlayer().isSneaking()) {
                                         if (stacker.canAddValue(1)) {
                                             int subAmt = Utils.subtractPlayerHandAmount(e.getPlayer(), 1);
                                             stacker.incrementValue(subAmt);
-                                            plugin.getLangManager().getText("valueAdded").replaceInteger("%1", subAmt).replaceText("%2", material.toString().toLowerCase()).send(e.getPlayer(), true);
+                                            plugin.getLangSettings().getText("valueAdded", true)
+                                                    .addPlaceHolder("%1", subAmt)
+                                                    .addPlaceHolder("%2", material.toString().toLowerCase())
+                                                    .send(e.getPlayer());
                                         } else
-                                            plugin.getLangManager().getText("maxStorageReached").replaceInteger("%s", plugin.getSettings().getMaxStorage(stacker.getType())).send(e.getPlayer(), true);
+                                            plugin.getLangSettings().getText("maxStorageReached", true)
+                                                    .addPlaceHolder("%s", settings.getMaxStorage(stacker.getType()))
+                                                    .send(e.getPlayer());
                                     } else {
                                         if (stacker.canAddValue(e.getPlayer().getItemInHand().getAmount())) {
                                             int subAmt = Utils.subtractPlayerHandAmount(e.getPlayer(), 64);
                                             stacker.incrementValue(subAmt);
-                                            plugin.getLangManager().getText("valueAdded").replaceInteger("%1", subAmt).replaceText("%2", material.toString().toLowerCase()).send(e.getPlayer(), true);
+                                            plugin.getLangSettings().getText("valueAdded", true)
+                                                    .addPlaceHolder("%1", subAmt)
+                                                    .addPlaceHolder("%2", material.toString().toLowerCase())
+                                                    .send(e.getPlayer());
                                         } else if (stacker.getStorageLeft() >= 1) {
                                             int storageLeft = stacker.getStorageLeft();
                                             int subAmt = Utils.subtractPlayerHandAmount(e.getPlayer(), storageLeft);
                                             stacker.incrementValue(subAmt);
-                                            plugin.getLangManager().getText("valueAdded").replaceInteger("%1", subAmt).replaceText("%2", material.toString().toLowerCase()).send(e.getPlayer(), true);
+                                            plugin.getLangSettings().getText("valueAdded", true)
+                                                    .addPlaceHolder("%1", subAmt)
+                                                    .addPlaceHolder("%2", material.toString().toLowerCase())
+                                                    .send(e.getPlayer());
                                         } else
-                                            plugin.getLangManager().getText("maxStorageReached").replaceInteger("%s", plugin.getSettings().getMaxStorage(stacker.getType())).send(e.getPlayer(), true);
+                                            plugin.getLangSettings().getText("maxStorageReached", true)
+                                                    .addPlaceHolder("%s", settings.getMaxStorage(stacker.getType()))
+                                                    .send(e.getPlayer());
                                     }
                                 } else
-                                    plugin.getLangManager().getText("materialNoMatch").replaceText("%s", stacker.getStackMaterial().toString().toLowerCase()).send(e.getPlayer(), true);
-                            } else plugin.getLangManager().getText("stackerNoPermission").send(e.getPlayer(), true);
-                        } else plugin.getLangManager().getText("invalidBlock").send(e.getPlayer(), true);
-                    } else plugin.getLangManager().getText("invalidBlock").send(e.getPlayer(), true);
-                } else plugin.getLangManager().getText("stackerNoPermission").send(e.getPlayer(), true);
+                                    plugin.getLangSettings().getText("materialNoMatch", true).addPlaceHolder("%s", stacker.getStackMaterial().toString().toLowerCase()).send(e.getPlayer());
+                            } else plugin.getLangSettings().sendText(e.getPlayer(), "stackerNoPermission", true);
+                        } else plugin.getLangSettings().sendText(e.getPlayer(), "invalidBlock", true);
+                    } else plugin.getLangSettings().sendText(e.getPlayer(), "invalidBlock", true);
+                } else plugin.getLangSettings().sendText(e.getPlayer(), "stackerNoPermission", true);
             } else {
-                if (!plugin.getSettings().getLinkedGUI(stacker.getType()).equals("NA"))
-                {
-                    if (plugin.getDependencyManager().getSkyblockHook().canModifyStacker(stacker, e.getPlayer()))
-                    {
+                if (!plugin.getStackerSettings().getLinkedGUI(stacker.getType()).equals("NA")) {
+                    if (plugin.getDependencyManager().getSkyblockHook().canModifyStacker(stacker, e.getPlayer())) {
                         plugin.getGuiManager().openStacker(e.getPlayer(), stacker);
-                    }else plugin.getLangManager().getText("stackerNoPermission").send(e.getPlayer(), true);
-                }else plugin.getLangManager().getText("invalidBlock").send(e.getPlayer(), true);
+                    } else plugin.getLangSettings().sendText(e.getPlayer(), "stackerNoPermission", true);
+                } else plugin.getLangSettings().sendText(e.getPlayer(), "invalidBlock", true);
             }
         }
 
@@ -114,36 +127,45 @@ public class StackerInteractEvent implements Listener {
                             if (!e.getPlayer().isSneaking()) {
                                 if (Utils.hasAvailableSlot(e.getPlayer(), stacker.getStackMaterial(), 1)) {
                                     e.getPlayer().getInventory().addItem(new ItemStack(stacker.getStackMaterial(), 1));
-                                    plugin.getLangManager().getText("valueSubtracted").replaceInteger("%1", 1).replaceText("%2", stacker.getStackMaterial().toString().toLowerCase()).send(e.getPlayer(), true);
+                                    plugin.getLangSettings().getText("valueSubtracted", true)
+                                            .addPlaceHolder("%1", 1)
+                                            .addPlaceHolder("%2", stacker.getStackMaterial().toString().toLowerCase())
+                                            .send(e.getPlayer());
                                     stacker.subtractValue(1);
-                                } else plugin.getLangManager().getText("inventoryFull").send(e.getPlayer(), true);
+                                } else plugin.getLangSettings().sendText(e.getPlayer(), "inventoryFull", true);
                             } else {
                                 if (stacker.canSubtractValue(64)) {
                                     if (Utils.hasAvailableSlot(e.getPlayer(), stacker.getStackMaterial(), 64)) {
                                         e.getPlayer().getInventory().addItem(new ItemStack(stacker.getStackMaterial(), 64));
-                                        plugin.getLangManager().getText("valueSubtracted").replaceInteger("%1", 64).replaceText("%2", stacker.getStackMaterial().toString().toLowerCase()).send(e.getPlayer(), true);
+                                        plugin.getLangSettings().getText("valueSubtracted", true)
+                                                .addPlaceHolder("%1", 64)
+                                                .addPlaceHolder("%2", stacker.getStackMaterial().toString().toLowerCase())
+                                                .send(e.getPlayer());
                                         stacker.subtractValue(64);
-                                    } else plugin.getLangManager().getText("inventoryFull").send(e.getPlayer(), true);
+                                    } else plugin.getLangSettings().sendText(e.getPlayer(), "inventoryFull", true);
                                 } else {
                                     if (Utils.hasAvailableSlot(e.getPlayer(), stacker.getStackMaterial(), stacker.getValue())) {
                                         e.getPlayer().getInventory().addItem(new ItemStack(stacker.getStackMaterial(), stacker.getValue()));
-                                        plugin.getLangManager().getText("valueSubtracted").replaceInteger("%1", stacker.getValue()).replaceText("%2", stacker.getStackMaterial().toString().toLowerCase()).send(e.getPlayer(), true);
+                                        plugin.getLangSettings().getText("valueSubtracted", true)
+                                                .addPlaceHolder("%1", stacker.getValue())
+                                                .addPlaceHolder("%2", stacker.getStackMaterial().toString().toLowerCase())
+                                                .send(e.getPlayer());
                                         stacker.setValue(0);
-                                    } else plugin.getLangManager().getText("inventoryFull").send(e.getPlayer(), true);
+                                    } else plugin.getLangSettings().sendText(e.getPlayer(), "inventoryFull", true);
                                 }
                             }
                         }
                     } else {
                         e.setCancelled(true);
-                        plugin.getLangManager().getText("stackerNoPermission").send(e.getPlayer(), true);
+                        plugin.getLangSettings().sendText(e.getPlayer(), "stackerNoPermission", true);
                     }
                 } else {
                     e.setCancelled(true);
-                    plugin.getLangManager().getText("stackerNoPermission").send(e.getPlayer(), true);
+                    plugin.getLangSettings().sendText(e.getPlayer(), "stackerNoPermission", true);
                 }
             } else {
                 e.setCancelled(true);
-                plugin.getLangManager().getText("minStorageReached").send(e.getPlayer(), true);
+                plugin.getLangSettings().sendText(e.getPlayer(), "minStorageReached", true);
             }
         }
 

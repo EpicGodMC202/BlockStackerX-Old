@@ -1,8 +1,8 @@
 package me.epicgodmc.blockstackerx.listeners;
 
 import me.epicgodmc.blockstackerx.BlockStackerX;
-import me.epicgodmc.blockstackerx.enumerators.Permission;
 import me.epicgodmc.blockstackerx.StackerBlock;
+import me.epicgodmc.blockstackerx.enumerators.Permission;
 import me.epicgodmc.blockstackerx.utils.Utils;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -32,21 +32,22 @@ public class StackerRemoveEvent implements Listener {
                     Material mat = player.getItemInHand().getType();
                     if (Utils.isPickaxe(mat)) {
                         e.setCancelled(true);
-                        player.getInventory().addItem(plugin.getSettings().getStackerItem(stacker).build());
+                        player.getInventory().addItem(plugin.getStackerSettings().getStackerItem(stacker).build());
                         stacker.delete();
-                        plugin.getLangManager().getText("stackerBreak").send(player, true);
+                        plugin.getLangSettings().sendText(player, "stackerBreak", true);
 
                     } else {
                         e.setCancelled(true);
-                        plugin.getLangManager().getText("usePickaxe").send(player, true);
+                        plugin.getLangSettings().sendText(player, "usePickaxe", true);
+
                     }
                 } else {
                     e.setCancelled(true);
-                    plugin.getLangManager().getText("stackerNoPermission").send(player, true);
+                    plugin.getLangSettings().sendText(player, "stackerNoPermission", true);
                 }
             } else {
                 e.setCancelled(true);
-                plugin.getLangManager().getText("stackerNoPermission").send(player, true);
+                plugin.getLangSettings().sendText(player, "stackerNoPermission", true);
             }
         }
     }

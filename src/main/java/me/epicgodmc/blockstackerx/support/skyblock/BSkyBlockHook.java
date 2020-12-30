@@ -4,6 +4,7 @@ import me.epicgodmc.blockstackerx.BlockStackerX;
 import me.epicgodmc.blockstackerx.StackerBlock;
 import me.epicgodmc.blockstackerx.enumerators.Permission;
 import org.bukkit.Location;
+import org.bukkit.World;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -20,33 +21,29 @@ public class BSkyBlockHook implements SkyblockHook, Listener {
 
     public BSkyBlockHook(BlockStackerX plugin) {
         this.plugin = plugin;
-        plugin.registerListener(this, null);
+        plugin.registerListener(this, "Calculate BSkyBlock island levels");
     }
 
     @Override
-    public Collection<UUID> getTeam(UUID uuid) {
-        @NonNull Optional<Island> optionalIsland = BentoBox.getInstance().getIslands().getIslandById(uuid.toString());
-        if (optionalIsland.isPresent()) {
-            return optionalIsland.get().getMembers().keySet();
+    public Collection<UUID> getTeam(World world, UUID uuid) {
+        Island island = BentoBox.getInstance().getIslands().getIsland(world, uuid);
+        if (island != null)
+        {
+            return island.getMemberSet();
         }
         return Collections.emptyList();
     }
 
     @Override
-    public boolean hasSameTeam(UUID p1, UUID p2) {
-        @NonNull Optional<Island> optionalIsland = BentoBox.getInstance().getIslands().getIslandById(p1.toString());
-        if (optionalIsland.isPresent()) {
-            Island island = optionalIsland.get();
-            return island.getMembers().containsKey(p2);
-        }
-        return false;
+    public boolean hasSameTeam(World world, UUID p1, UUID p2) {
+        return getTeam(world, p1).contains(p2);
     }
 
     @Override
     public boolean canModifyStacker(StackerBlock stacker, Player player) {
         return stacker.getOwner().equals(player.getUniqueId())
-                || plugin.getSettings().getDoTeamStacking(stacker.getType())
-                && this.hasSameTeam(stacker.getOwner(), player.getUniqueId())
+                || plugin.getStackerSettings().getDoTeamStacking(stacker.getType())
+                && this.hasSameTeam(stacker.getLocation().toBukkitLoc().getWorld(), stacker.getOwner(), player.getUniqueId())
                 || Permission.BYPASS.has(player, false);
     }
 
